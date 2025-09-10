@@ -1,4 +1,10 @@
 import {Sequelize} from "sequelize";
-import {config} from "./config";
+import {
+    configAreas,
+    configPrograms,
+    configSubjects
+} from "./config";
 
-export const sequelize = new Sequelize(config)
+export const sequelizeAreas = new Sequelize(configAreas)
+export const sequelizePrograms = new Sequelize(configPrograms)
+export const sequelizeSubjects = new Sequelize(configSubjects)
