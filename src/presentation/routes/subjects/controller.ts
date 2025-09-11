@@ -17,4 +17,19 @@ export default class SubjectsController {
             return c.json({error}, 500);
         }
     }
+
+    public getByAreas = async (c:Context) => {
+        try {
+            const { areasUuid } = await c.req.json();
+            if (!Array.isArray(areasUuid) || areasUuid.some(u => typeof u !== 'string' || u.trim() === '')) {
+                return c.json({ error: 'areasUuid must be a non-empty array of strings' }, 400);
+            }
+            const subjects = await this.subjectRepository.getSubjectsByAreas(areasUuid);
+            return c.json(subjects);
+        } catch (error) {
+            console.log(error);
+            
+            return c.json({error}, 500);
+        }
+    }
 }

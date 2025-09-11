@@ -6,6 +6,7 @@ export default class SubjectsRoutes {
         const routes = new Hono()
         const controller = new SubjectsController()
         routes.get("/", controller.getAll)
+        routes.post("/by-areas", controller.getByAreas)
         return routes
     }
 }

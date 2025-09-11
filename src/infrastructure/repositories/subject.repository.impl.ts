@@ -12,4 +12,8 @@ export default class SubjectRepositoryImpl implements SubjectRepository {
     getAll(): Promise<SubjectFromSubjectsEntity[]> {
         return this.subjectDataSource.getSubjects();
     }
+
+    getSubjectsByAreas(areasUuid: string[]): Promise<SubjectFromSubjectsEntity[]> {
+        return this.subjectDataSource.getSubjectsByAreas(areasUuid);
+    }
 }
