@@ -45,6 +45,10 @@ export default class SubjectDataSourceImpl implements SubjectDataSource {
                 where: { uuid: { [Op.in]: areaSubjects.map(as => as.subjectId) } }
             })
 
+            for (const e of subjects) {
+                
+            }
+
             return subjects.map(SubjectFromSubjectsEntity.fromRow)
         } catch (error) {
             if (error instanceof CustomError) throw error

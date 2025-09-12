@@ -26,9 +26,7 @@ export default class SubjectsController {
             }
             const subjects = await this.subjectRepository.getSubjectsByAreas(areasUuid);
             return c.json(subjects);
-        } catch (error) {
-            console.log(error);
-            
+        } catch (error) {            
             return c.json({error}, 500);
         }
     }

@@ -1,4 +1,5 @@
 import { SubjectFromSubjectSequelize } from "@/infrastructure/database/models/subjects/subject";
+import AreaFromAreaEntity from "../areas/areaFromArea.entity";
 
 export default class SubjectFromSubjectsEntity {
     constructor(
@@ -12,6 +13,7 @@ export default class SubjectFromSubjectsEntity {
         public createdAt?: Date,
         public updatedAt?: Date,
         public deletedAt?: Date | null,
+        public area?: AreaFromAreaEntity
     ){}
 
     static fromRow(row: SubjectFromSubjectSequelize): SubjectFromSubjectsEntity {
