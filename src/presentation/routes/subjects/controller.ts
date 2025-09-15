@@ -3,7 +3,7 @@ import SubjectRepositoryImpl from "@/infrastructure/repositories/subject.reposit
 import { Context } from "hono";
 
 export default class SubjectsController {
-    private readonly subjectRepository: SubjectRepository;
+    private readonly subjectRepository: SubjectRepositoryImpl;
 
     constructor() {
         this.subjectRepository = new SubjectRepositoryImpl();
@@ -20,13 +20,15 @@ export default class SubjectsController {
 
     public getByAreas = async (c:Context) => {
         try {
-            const { areasUuid } = await c.req.json();
-            if (!Array.isArray(areasUuid) || areasUuid.some(u => typeof u !== 'string' || u.trim() === '')) {
-                return c.json({ error: 'areasUuid must be a non-empty array of strings' }, 400);
+            const { areas } = await c.req.json();
+            if (!Array.isArray(areas)) {
+                return c.json({ error: 'areas must be a non-empty array of strings' }, 400);
             }
-            const subjects = await this.subjectRepository.getSubjectsByAreas(areasUuid);
+            const subjects = await this.subjectRepository.getSubjectsByAreas(areas);
             return c.json(subjects);
         } catch (error) {            
+            console.log(error);
+            
             return c.json({error}, 500);
         }
     }

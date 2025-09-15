@@ -38,7 +38,7 @@ AreasFromSubjectsSequelize.init(
   },
   {
     sequelize: sequelizeSubjects,
-    tableName: "areas_programs",
+    tableName: "area",
     timestamps: false,   // la tabla no tiene created_at/updated_at
     underscored: true,
     paranoid: false,

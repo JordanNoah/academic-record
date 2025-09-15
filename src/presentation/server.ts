@@ -49,11 +49,13 @@ export class Server {
 
 
             this.app.route('/api/v1', new AppRoutes().routes)
-            serve({
-                fetch: this.app.fetch,
-                port: this.port
-            }, (info) => {
-                console.log(`Server running on port ${info.port}`)
+            DbSequelize().then(() => {
+                serve({
+                    fetch: this.app.fetch,
+                    port: this.port
+                }, (info) => {
+                    console.log(`Server running on port ${info.port}`)
+                })
             })
             console.timeEnd('Server started in')
         } catch (e) {

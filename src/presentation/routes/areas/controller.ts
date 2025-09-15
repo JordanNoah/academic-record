@@ -3,7 +3,7 @@ import AreasRepositoryImpl from "@/infrastructure/repositories/area.repository.i
 import { Context } from "hono";
 
 export default class AreasController {
-    private readonly areaRepository: AreasRepository;
+    private readonly areaRepository: AreasRepositoryImpl;
 
     constructor() {
         this.areaRepository = new AreasRepositoryImpl();

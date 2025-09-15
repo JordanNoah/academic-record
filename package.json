@@ -1,7 +1,8 @@
 {
-  "name": "academic-selection",
+  "name": "sapa",
   "version": "1.0.0",
   "main": "index.js",
+  "description": "SAPA — acrónimo de Subjects, Areas, Programs Administration.",
   "scripts": {
     "test": "jest --watchAll --verbose",
     "test:ci": "jest --coverage --verbose",
@@ -13,7 +14,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "@hono/node-server": "^1.19.1",
     "cross-env": "^10.0.0",

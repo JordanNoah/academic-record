@@ -24,33 +24,42 @@ export default class SubjectDataSourceImpl implements SubjectDataSource {
    */
     async getSubjectsByAreas(areasUuid: string[]): Promise<SubjectFromSubjectsEntity[]> {
         try {
-            const areas = await AreasFromSubjectsSequelize.findAll({
-                attributes: ['uuid'],
-                where: { uuid: { [Op.in]: areasUuid } }
-            })
+            const where = areasUuid?.length
+                ? { uuid: { [Op.in]: areasUuid } }
+                : {}
+            const areas = await AreasFromSubjectsSequelize.findAll({ where })
 
-            // detectar las que no existen
-            const foundUuids = areas.map(a => a.uuid)
-            const missing = areasUuid.filter(u => !foundUuids.includes(u))
+            if (!areas.length) return []
 
-            if (missing.length > 0) {
-                throw CustomError.notFound(`Areas not found: ${missing.join(', ')}`)
-            }
+            const foundAreasUuid = areas.map(a => a.uuid)
+            const notFoundAreas = areasUuid.filter(u => !foundAreasUuid.includes(u))
+            if (notFoundAreas.length) {
+                throw CustomError.notFound(`Areas not found: ${notFoundAreas.join(", ")}`)
+            }            
 
-            const areaSubjects = await AreaSubjectFromSubjectsSequelize.findAll({
-                where: { areaId: { [Op.in]: foundUuids } }
-            })
-
-            const subjects = await SubjectFromSubjectSequelize.findAll({
-                where: { uuid: { [Op.in]: areaSubjects.map(as => as.subjectId) } }
-            })
-
-            for (const e of subjects) {
-                
-            }
-
-            return subjects.map(SubjectFromSubjectsEntity.fromRow)
+            const areaSubject = await AreaSubjectFromSubjectsSequelize.findAll({
+                attributes:["areaId","subjectId"],
+                where: {
+                    areaId: { [Op.in]: areas.map(a => a.id) }
+                },
+                include: [
+                    {
+                        model: SubjectFromSubjectSequelize,
+                        as: 'subject',
+                    },
+                    {
+                        model: AreasFromSubjectsSequelize,
+                        as: 'area',
+                    }
+                ]
+            });
+            
+            
+            return areaSubject.map(as => {
+                return SubjectFromSubjectsEntity.areaSubjectFromSubjectRow(as);
+            });
         } catch (error) {
+            console.log(error);
             if (error instanceof CustomError) throw error
             throw CustomError.internalServer()
         }

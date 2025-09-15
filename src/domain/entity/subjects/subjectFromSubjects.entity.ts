@@ -1,5 +1,8 @@
 import { SubjectFromSubjectSequelize } from "@/infrastructure/database/models/subjects/subject";
 import AreaFromAreaEntity from "../areas/areaFromArea.entity";
+import { AreaSubjectFromSubjectsSequelize } from "@/infrastructure/database/models/subjects/areasSubjects";
+import { AreasFromSubjectsSequelize } from "@/infrastructure/database/models/subjects/areas";
+import AreaFromSubjectEntity from "./areaFromSubject.entity";
 
 export default class SubjectFromSubjectsEntity {
     constructor(
@@ -13,7 +16,7 @@ export default class SubjectFromSubjectsEntity {
         public createdAt?: Date,
         public updatedAt?: Date,
         public deletedAt?: Date | null,
-        public area?: AreaFromAreaEntity
+        public area?: AreaFromSubjectEntity
     ){}
 
     static fromRow(row: SubjectFromSubjectSequelize): SubjectFromSubjectsEntity {
@@ -28,6 +31,22 @@ export default class SubjectFromSubjectsEntity {
             row.createdAt,
             row.updatedAt,
             row.deletedAt,
+        );
+    }
+
+    static areaSubjectFromSubjectRow(row: AreaSubjectFromSubjectsSequelize): SubjectFromSubjectsEntity {
+        return new SubjectFromSubjectsEntity(
+            row.subject!.id,
+            row.subject!.uuid,
+            row.subject!.abbr,
+            row.subject!.nameI18n,
+            row.subject!.options,
+            row.subject!.active,
+            row.subject!.description,
+            row.subject!.createdAt,
+            row.subject!.updatedAt,
+            row.subject!.deletedAt,
+            row.area ? AreaFromSubjectEntity.fromRow(row.area) : undefined
         );
     }
 }

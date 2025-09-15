@@ -1,11 +1,12 @@
 import { AreaSequelize } from "@/infrastructure/database/models/areas/area";
+import { mapperLangs } from "@/shared/trait";
 
 export default class AreaFromAreaEntity {
     constructor(
         public id: number,
         public uuid: string,
         public abbr: string,
-        public nameI18n: unknown,
+        public translations: unknown,
         public options: unknown,
         public active: boolean,
         public description?: string | null,
@@ -19,7 +20,7 @@ export default class AreaFromAreaEntity {
             row.id,
             row.uuid,
             row.abbr,
-            row.nameI18n,
+            mapperLangs(row.nameI18n),
             row.options,
             row.active,
             row.description,
