@@ -3,6 +3,7 @@ import AreaFromAreaEntity from "../areas/areaFromArea.entity";
 import { AreaSubjectFromSubjectsSequelize } from "@/infrastructure/database/models/subjects/areasSubjects";
 import { AreasFromSubjectsSequelize } from "@/infrastructure/database/models/subjects/areas";
 import AreaFromSubjectEntity from "./areaFromSubject.entity";
+import { mapperLangs } from "@/shared/trait";
 
 export default class SubjectFromSubjectsEntity {
     constructor(
@@ -16,7 +17,7 @@ export default class SubjectFromSubjectsEntity {
         public createdAt?: Date,
         public updatedAt?: Date,
         public deletedAt?: Date | null,
-        public area?: AreaFromSubjectEntity
+        public area?: AreaFromAreaEntity | undefined,
     ){}
 
     static fromRow(row: SubjectFromSubjectSequelize): SubjectFromSubjectsEntity {
@@ -39,14 +40,14 @@ export default class SubjectFromSubjectsEntity {
             row.subject!.id,
             row.subject!.uuid,
             row.subject!.abbr,
-            row.subject!.nameI18n,
+            mapperLangs(row.subject!.nameI18n),
             row.subject!.options,
             row.subject!.active,
             row.subject!.description,
             row.subject!.createdAt,
             row.subject!.updatedAt,
             row.subject!.deletedAt,
-            row.area ? AreaFromSubjectEntity.fromRow(row.area) : undefined
+            undefined
         );
     }
 }

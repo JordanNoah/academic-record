@@ -1,4 +1,5 @@
 import { ProgramsFromProgramSequelize } from "@/infrastructure/database/models/programs/programs";
+import { mapperLangs } from "@/shared/trait";
 
 export default class ProgramEntity {
     constructor(
@@ -21,7 +22,7 @@ export default class ProgramEntity {
             row.uuid,
             row.programTypeId,
             row.abbr,
-            row.nameI18n,
+            mapperLangs(row.nameI18n),
             row.options,
             row.active,
             row.description,

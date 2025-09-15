@@ -5,6 +5,7 @@ import { SubjectFromSubjectSequelize } from "../database/models/subjects/subject
 import { AreaSubjectFromSubjectsSequelize } from "../database/models/subjects/areasSubjects";
 import { AreasFromSubjectsSequelize } from "../database/models/subjects/areas";
 import { Op } from "sequelize";
+import AreaDataSourceImpl from "./area.datasource.impl";
 
 export default class SubjectDataSourceImpl implements SubjectDataSource {
     async getSubjects(): Promise<SubjectFromSubjectsEntity[]> {
@@ -27,7 +28,7 @@ export default class SubjectDataSourceImpl implements SubjectDataSource {
             const where = areasUuid?.length
                 ? { uuid: { [Op.in]: areasUuid } }
                 : {}
-            const areas = await AreasFromSubjectsSequelize.findAll({ where })
+            const areas = await new AreaDataSourceImpl().getAll()
 
             if (!areas.length) return []
 
@@ -51,12 +52,18 @@ export default class SubjectDataSourceImpl implements SubjectDataSource {
                         model: AreasFromSubjectsSequelize,
                         as: 'area',
                     }
-                ]
+                ],
             });
             
             
             return areaSubject.map(as => {
-                return SubjectFromSubjectsEntity.areaSubjectFromSubjectRow(as);
+                const subject = SubjectFromSubjectsEntity.areaSubjectFromSubjectRow(as);
+                const area = areas.find(a => a.id === as.areaId);
+                if(!area) throw CustomError.internalServer("Area not found for subject");
+                subject.area = area
+                console.log(subject);
+                
+                return subject;
             });
         } catch (error) {
             console.log(error);
