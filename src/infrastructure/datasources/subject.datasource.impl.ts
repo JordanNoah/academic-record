@@ -6,6 +6,8 @@ import { AreaSubjectFromSubjectsSequelize } from "../database/models/subjects/ar
 import { AreasFromSubjectsSequelize } from "../database/models/subjects/areas";
 import { Op } from "sequelize";
 import AreaDataSourceImpl from "./area.datasource.impl";
+import { PaginationDto } from "@/domain/dtos/pagination.dto";
+import PaginatedEntity from "@/domain/entity/paginated.entity";
 
 export default class SubjectDataSourceImpl implements SubjectDataSource {
     async getSubjects(): Promise<SubjectFromSubjectsEntity[]> {
@@ -23,14 +25,14 @@ export default class SubjectDataSourceImpl implements SubjectDataSource {
     /**
    * Variante A: 1–N (Subject.areaUuid FK)
    */
-    async getSubjectsByAreas(areasUuid: string[]): Promise<SubjectFromSubjectsEntity[]> {
-        try {
+    async getSubjectsByAreas(areasUuid: string[], pagination: PaginationDto): Promise<PaginatedEntity<SubjectFromSubjectsEntity>> {
+        try {            
             const where = areasUuid?.length
                 ? { uuid: { [Op.in]: areasUuid } }
                 : {}
             const areas = await new AreaDataSourceImpl().getAll()
 
-            if (!areas.length) return []
+            if (!areas.length) return new PaginatedEntity<SubjectFromSubjectsEntity>([],0,pagination.page,pagination.itemsPerPage,0) 
 
             const foundAreasUuid = areas.map(a => a.uuid)
             const notFoundAreas = areasUuid.filter(u => !foundAreasUuid.includes(u))
@@ -38,7 +40,7 @@ export default class SubjectDataSourceImpl implements SubjectDataSource {
                 throw CustomError.notFound(`Areas not found: ${notFoundAreas.join(", ")}`)
             }            
 
-            const areaSubject = await AreaSubjectFromSubjectsSequelize.findAll({
+            const areaSubject = await AreaSubjectFromSubjectsSequelize.findAndCountAll({
                 attributes:["areaId","subjectId"],
                 where: {
                     areaId: { [Op.in]: areas.map(a => a.id) }
@@ -53,18 +55,19 @@ export default class SubjectDataSourceImpl implements SubjectDataSource {
                         as: 'area',
                     }
                 ],
+                limit: pagination.itemsPerPage,
+                offset: (pagination.page - 1) * pagination.itemsPerPage,
             });
             
-            
-            return areaSubject.map(as => {
+            const subjects = areaSubject.rows.map(as => {
                 const subject = SubjectFromSubjectsEntity.areaSubjectFromSubjectRow(as);
                 const area = areas.find(a => a.id === as.areaId);
                 if(!area) throw CustomError.internalServer("Area not found for subject");
                 subject.area = area
-                console.log(subject);
-                
                 return subject;
             });
+
+            return new PaginatedEntity<SubjectFromSubjectsEntity>(subjects, areaSubject.count, pagination.page, pagination.itemsPerPage, Math.ceil(areaSubject.count / pagination.itemsPerPage));
         } catch (error) {
             console.log(error);
             if (error instanceof CustomError) throw error
